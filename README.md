@@ -37,9 +37,10 @@ Aurora_App/
 │   ├── AppName/
 │   │   ├── src/
 │   │   ├── bin/
+│   │   ├── img/
 │   │   └── README.md
 │   └── ...
-└── LICENSE
+└── LICENSE.md
 ```
 
 This structure is only an example and may evolve as the project grows.
