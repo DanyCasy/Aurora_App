@@ -89,6 +89,14 @@ Thanks to the **AuroraOS Team** for developing AuroraOS and providing the enviro
 
 - AuroraOS: https://github.com/TeamAuroraOS/AuroraOS
 
+## 🌐 AuroraOS Store
+
+All my applications will be published on the AuroraOS Store, where you will be able to find and access all the apps I develop for AuroraOS on the Nintendo 3DS.
+
+**[Visit the AuroraOS Store](https://account.aurora3ds.xyz/login?next=%2Fstore)**
+
+Log in to your AuroraOS account to access the store and discover my applications.
+
 ## 📄 License
 
 Please refer to the license information provided in the repository. If no license is specified, the source code remains subject to the applicable copyright laws.
