@@ -128,14 +128,6 @@ All my applications will be published on the AuroraOS Store, where you will be a
 
 Log in to your AuroraOS account to access the store and discover my applications.
 
-## 📜 License
-
-The terms governing the use, modification, and redistribution of source code and binaries depend on the license applicable to each item.
-
-Licensing information will be provided in this repository or in the documentation for individual applications, where applicable.
-
-Without an applicable license, do not assume that the code or binaries may be freely modified or redistributed.
-
 ## 👨‍💻 Author
 
 **DanyCasy**
