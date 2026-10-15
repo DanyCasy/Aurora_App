@@ -105,7 +105,7 @@ Log in to your AuroraOS account to access the store and discover my applications
 
 ## 📄 License
 
-Check the repository for licensing information. If no license is provided, the source code remains subject to its applicable copyright restrictions.
+This application, including its source code and compiled binaries, is subject to the terms and conditions specified in [`Aurora_App/LICENSE.md`](../../LICENSE.md).
 
 ---
 
