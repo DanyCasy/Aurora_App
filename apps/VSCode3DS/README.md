@@ -1,4 +1,4 @@
-# VSCode3DS 1.0
+# VSCode3DS
 
 Il programma è contenuto interamente in `VSCode3DS.c`. Lo stesso file produce l'app AuroraOS e il servizio di compilazione per macOS/Linux, scegliendo la modalità durante la compilazione. Non servono altri sorgenti specifici di questo progetto.
 
