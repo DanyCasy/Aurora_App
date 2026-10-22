@@ -1,145 +1,145 @@
 # VSCode3DS
 
-Il programma è contenuto interamente in `VSCode3DS.c`. Lo stesso file produce l'app AuroraOS e il servizio di compilazione per macOS/Linux, scegliendo la modalità durante la compilazione. Non servono altri sorgenti specifici di questo progetto.
+The entire program is contained in `VSCode3DS.c`. The same file produces both the AuroraOS application and the build service for macOS/Linux, with the mode selected at compile time. No other project-specific source files are required.
 
-È incluso anche `VSCode3DS.bin`, già compilato per AuroraOS. Il file sorgente contiene inoltre una modalità di test del motore di modifica.
+`VSCode3DS.bin`, already compiled for AuroraOS, is also included. The source file additionally contains a testing mode for the editing engine.
 
-## Versione verificata
+## Verified Version
 
-Repository AuroraOS: [TeamAuroraOS/AuroraOS](https://github.com/TeamAuroraOS/AuroraOS), commit [`8123fd90b606e5a1c44d8a7e474edce83681dcab`](https://github.com/TeamAuroraOS/AuroraOS/tree/8123fd90b606e5a1c44d8a7e474edce83681dcab). Il relativo README indica **Beta 7 v0.1.6**, e `aurora_app.h` dichiara **C SDK 1.2**. La precedente ricognizione della chat si riferiva a una versione anteriore.
+AuroraOS repository: [TeamAuroraOS/AuroraOS](https://github.com/TeamAuroraOS/AuroraOS), commit [`8123fd90b606e5a1c44d8a7e474edce83681dcab`](https://github.com/TeamAuroraOS/AuroraOS/tree/8123fd90b606e5a1c44d8a7e474edce83681dcab). Its README identifies **Beta 7 v0.1.6**, and `aurora_app.h` declares **C SDK 1.2**. The previous investigation in this chat referred to an earlier version.
 
-La compilazione ARM e quella del servizio sono state eseguite con gli avvisi trattati come errori. Non è stato eseguito un test su console fisica: touch, compatibilità dei modelli, prestazioni, uscita HOME e Wi-Fi devono ancora essere collaudati su hardware.
+Both the ARM application and the host service were compiled with warnings treated as errors. Testing on a physical console has not been performed: touch input, model compatibility, performance, HOME exit behavior, and Wi-Fi still need to be tested on actual hardware.
 
-## Installare l'app
+## Installing the Application
 
-1. Usa AuroraOS Beta 7 con il relativo runtime e una SD funzionante.
-2. Copia `VSCode3DS.bin` in `SD:/Aurora/Apps/C/`.
-3. Avvialo dal menu di AuroraOS. La sua cartella dati sarà `SD:/Aurora/Apps/C/VSCode3DS/`.
+1. Use AuroraOS Beta 7 with its corresponding runtime and a working SD card.
+2. Copy `VSCode3DS.bin` to `SD:/Aurora/Apps/C/`.
+3. Launch it from the AuroraOS menu. Its data directory will be `SD:/Aurora/Apps/C/VSCode3DS/`.
 
-Il progetto iniziale si trova in `SD:/Aurora/Apps/C/VSCode3DS/projects/Default/`. Puoi scegliere un'altra cartella SD dal comando **Project folder**. Salvare tutti i documenti è richiesto prima di cambiare progetto.
+The initial project is located at `SD:/Aurora/Apps/C/VSCode3DS/projects/Default/`. You can select another SD card folder using the **Project folder** command. All documents must be saved before switching projects.
 
-Non avviare l'IDE rinominandolo `AURORAOS.BIN`: usa il menu di AuroraOS, che fornisce i servizi ARM11 necessari a touch e rete.
+Do not launch the IDE by renaming it to `AURORAOS.BIN`. Use the AuroraOS menu, which provides the ARM11 services required for touch input and networking.
 
-## Ricompilare l'app dal singolo C
+## Rebuilding the Application from a Single C File
 
-Installa devkitARM e Python 3. Scarica la repository AuroraOS verificata, poi dalla sua cartella principale esegui:
+Install devkitARM and Python 3. Download the verified AuroraOS repository, then run the following command from its root directory:
 
 ```sh
-python3 sdk/aurcc.py build /percorso/VSCode3DS.c -o VSCode3DS.bin
+python3 sdk/aurcc.py build /path/to/VSCode3DS.c -o VSCode3DS.bin
 ```
 
-Su Windows il launcher può essere `py` al posto di `python3`. Il servizio host qui fornito è per macOS/Linux.
+On Windows, the launcher may be `py` instead of `python3`. The host service provided here is intended for macOS/Linux.
 
-## Preparare il computer per le build
+## Preparing the Computer for Builds
 
-Il computer deve avere la repository AuroraOS completa, Python 3.10 o successivo e devkitARM. `arm-none-eabi-gcc` e `arm-none-eabi-objcopy` devono essere nel `PATH` ereditato dal servizio.
+The computer must have the complete AuroraOS repository, Python 3.10 or later, and devkitARM. Both `arm-none-eabi-gcc` and `arm-none-eabi-objcopy` must be available in the `PATH` inherited by the service.
 
-Compila il servizio usando lo stesso file:
+Compile the service using the same file:
 
 ```sh
 cc -std=c11 -O2 -Wall -Wextra -DVS3DS_HOST VSCode3DS.c -o vs3ds-host
 ```
 
-Avvialo indicando la cartella principale di AuroraOS, un token di 16–95 caratteri e l'IP LAN del computer:
+Launch it by specifying the AuroraOS root directory, a token between 16 and 95 characters, and the computer's LAN IP address:
 
 ```sh
-./vs3ds-host --root /percorso/AuroraOS --token IL_TUO_TOKEN_LUNGO --bind 192.168.1.2
+./vs3ds-host --root /path/to/AuroraOS --token YOUR_LONG_TOKEN --bind 192.168.1.2
 ```
 
-L'IP è un esempio: inserisci quello reale del computer. La porta predefinita è `45321`; puoi cambiarla con `--port`. Senza `--bind`, il servizio ascolta solo su `127.0.0.1` e il 3DS non può raggiungerlo. Se il firewall chiede l'accesso, consentilo sulla rete privata che userai.
+The IP address is only an example: replace it with your computer's actual address. The default port is `45321`, which can be changed using `--port`. Without `--bind`, the service listens only on `127.0.0.1`, preventing the 3DS from connecting. If the firewall requests permission, allow access on the private network you intend to use.
 
-Il trasporto è TCP in chiaro, per compatibilità con AuroraOS. Usa una LAN fidata; non aprire questa porta su Internet. Il token autentica le richieste ma non cifra token e sorgenti. Le somme di controllo FNV verificano errori di trasferimento, non forniscono autenticità crittografica.
+Communication uses unencrypted TCP for compatibility with AuroraOS. Use a trusted LAN and do not expose this port to the Internet. The token authenticates requests but does not encrypt the token or source files. FNV checksums detect transfer errors but do not provide cryptographic authenticity.
 
-Sul 3DS configura la rete Wi-Fi nelle impostazioni di AuroraOS. In VSCode3DS, premi **START** e imposta **Host address**, **Host token**, **Host port**, poi usa **Test connection**. Il computer deve restare acceso e il servizio in esecuzione.
+On the 3DS, configure the Wi-Fi connection in the AuroraOS settings. In VSCode3DS, press **START** and configure **Host address**, **Host token**, and **Host port**, then select **Test connection**. The computer must remain powered on with the service running.
 
-## Progetti Auric e C
+## Auric and C Projects
 
-Dal menu puoi creare file `.aur`, `.c`, `.h` e altri file di testo. Imposta **Project entry file** sul sorgente principale, ad esempio `main.aur` oppure `main.c`. Imposta **Output app name** per il nome dell'app installata.
+From the menu, you can create `.aur`, `.c`, `.h`, and other text files. Set **Project entry file** to the main source file, such as `main.aur` or `main.c`. Set **Output app name** to define the installed application's name.
 
-- **Auric:** il servizio compila il file principale con `compiler.aurc` e produce un contenitore `AUR1`.
-- **C:** il servizio compila ricorsivamente i file `.c` della cartella progetto con `sdk/aurcc.py`, usando la cartella progetto anche come include path, e produce `AURC`.
-- Tieni programmi C indipendenti in cartelle progetto distinte: più funzioni `main` nello stesso progetto causano un errore di collegamento.
-- Un file `app.icon` alla radice del progetto fornisce l'icona testuale 32×32 del menu.
-- Il contenuto di `assets/` viene copiato nella cartella dati dell'app installata, mantenendo le sottocartelle. In C usa `app_dir()` per costruirne i percorsi. In Auric puoi usare i percorsi relativi previsti dal suo runtime.
-- I nomi relativi dei progetti devono usare caratteri ASCII stampabili, senza componenti nascosti o riservati; i contenuti dei documenti possono essere UTF-8.
+- **Auric:** The service compiles the main source file using `compiler.aurc` and produces an `AUR1` container.
+- **C:** The service recursively compiles the `.c` files in the project directory using `sdk/aurcc.py`, also using the project directory as an include path, and produces `AURC`.
+- Keep independent C programs in separate project directories. Multiple `main` functions within the same project will cause a linker error.
+- An `app.icon` file in the project root provides the 32×32 text-based icon displayed in the menu.
+- The contents of `assets/` are copied to the installed application's data directory, preserving subdirectories. In C, use `app_dir()` to construct their paths. In Auric, you can use the relative paths supported by its runtime.
+- Relative project names must use printable ASCII characters, without hidden or reserved path components. Document contents may use UTF-8.
 
-Premi **Y** oppure **Build**. Il progetto viene salvato e trasferito a blocchi, verificato, compilato e scaricato. Puoi continuare a modificare i buffer, ma i salvataggi e le operazioni che cambiano i file rimangono bloccati durante la build per mantenere coerente il progetto su disco. Non modificare la SD da un altro dispositivo durante la build.
+Press **Y** or select **Build**. The project is saved, transferred in chunks, verified, compiled, and downloaded. You can continue editing buffers, but saving and file-changing operations remain locked during the build to keep the project on disk consistent. Do not modify the SD card from another device while a build is running.
 
-I trasferimenti supportano la ritrasmissione dei blocchi. Dopo errori di trasporto il client riprova e poi permette di riprendere con **A** oppure annullare con **B** nel pannello build. Una singola chiamata del SDK può bloccare temporaneamente input e rete: la cancellazione non interrompe quella chiamata a metà.
+Transfers support chunk retransmission. After transport errors, the client retries and then allows you to resume with **A** or cancel with **B** in the build panel. A single SDK call may temporarily block input and networking; cancellation cannot interrupt that call midway.
 
-Le app vengono installate in `SD:/Aurora/Apps/` per Auric e `SD:/Aurora/Apps/C/` per C. Puoi scegliere tra sostituzione con backup `.bak` e copie numerate. Avvia il risultato dal menu Home di AuroraOS; il programma non inventa un'API di lancio diretto non presente nel SDK pubblico.
+Applications are installed in `SD:/Aurora/Apps/` for Auric and `SD:/Aurora/Apps/C/` for C. You can choose between replacement with a `.bak` backup and numbered copies. Launch the result from the AuroraOS Home menu. The program does not invent a direct-launch API that is absent from the public SDK.
 
-## Controlli e interfaccia
+## Controls and Interface
 
-| Controllo | Azione |
+| Control | Action |
 |---|---|
-| D-pad | Muove il cursore; tenendolo premuto ripete |
-| A + D-pad | Seleziona testo |
-| B | Backspace, con ripetizione nell'editor; annulla nelle finestre |
-| X | Salva il documento |
-| Y | Compila il progetto |
-| L / R | Documento precedente / successivo |
-| START | Apre o chiude l'elenco completo dei comandi |
-| SELECT | Cambia la pagina della tastiera |
-| SELECT + A | Seleziona tutto |
-| SELECT + sinistra / destra | Undo / redo |
-| SELECT + X / Y | Copia / incolla |
-| SELECT + su / giù | Pagina precedente / successiva |
-| Circle pad | Scorre il testo senza muovere il cursore |
+| D-pad | Moves the cursor; holding it repeats movement |
+| A + D-pad | Selects text |
+| B | Backspace, with repetition in the editor; cancels in dialogs |
+| X | Saves the document |
+| Y | Builds the project |
+| L / R | Previous / next document |
+| START | Opens or closes the complete command list |
+| SELECT | Switches keyboard pages |
+| SELECT + A | Select all |
+| SELECT + Left / Right | Undo / redo |
+| SELECT + X / Y | Copy / paste |
+| SELECT + Up / Down | Previous / next page |
+| Circle Pad | Scrolls the text without moving the cursor |
 
-La combinazione di sistema **L + giù + SELECT** appartiene ad AuroraOS.
+The system combination **L + Down + SELECT** belongs to AuroraOS.
 
-Lo schermo superiore mostra il codice. Lo schermo inferiore offre tastiera, simboli e snippet, esploratore, ricerca, diagnostica e guida offline. **Bottom code / keyboard** abilita una vista inferiore del testo: puoi toccare una posizione e fare doppio tocco per selezionare una parola.
+The upper screen displays the code. The lower screen provides the keyboard, symbols and snippets, file explorer, search, diagnostics, and offline help. **Bottom code / keyboard** enables a lower-screen code view: you can touch a position and double-tap to select a word.
 
-Le voci di menu includono ricerca avanti/indietro, maiuscole/minuscole, parole intere, sostituzione singola e globale, vai a riga, navigazione per parola, indentazione, commenti, duplicazione/spostamento/eliminazione righe, selezioni e salvataggio con nome. **Replace current matching selection** sostituisce un risultato selezionato da **Find**.
+Menu commands include forward/backward search, case sensitivity, whole-word matching, single and global replacement, go to line, word navigation, indentation, comments, line duplication/movement/deletion, selections, and Save As. **Replace current matching selection** replaces a result selected through **Find**.
 
-**Complete identifier** propone nomi dalla guida incorporata e dai documenti aperti. La guida include l'header SDK pubblico e il riferimento Auric completo dello snapshot verificato. Puoi cambiare dimensione del testo, tema, a capo visivo, tabulazioni, indentazione, coppie automatiche e terminatori LF/CRLF.
+**Complete identifier** suggests names from the built-in documentation and open documents. The documentation includes the public SDK header and the complete Auric reference from the verified snapshot. You can change the font size, theme, visual word wrapping, tab settings, indentation, automatic pairs, and LF/CRLF line endings.
 
-L'esploratore legge pagine di 256 voci; con L/R o i comandi di pagina accedi alle altre. Le voci sono ordinate all'interno di ciascuna pagina. Puoi rinominare anche file aperti e cartelle che li contengono. L'eliminazione richiede una conferma testuale, richiede di chiudere i documenti interessati e rimuove solo cartelle vuote. FAT non offre un cestino.
+The file explorer reads pages of 256 entries. Use L/R or the page commands to access additional pages. Entries are sorted within each page. You can also rename open files and directories containing them. Deletion requires textual confirmation, requires affected documents to be closed, and removes only empty directories. FAT does not provide a recycle bin.
 
-## Recupero e limiti
+## Recovery and Limitations
 
-La sessione viene salvata ogni 15 secondi e all'uscita gestita dal runtime, inclusa HOME. Il recupero conserva i buffer non salvati separatamente dai file originali. La sessione ha una somma di controllo e un backup. Solo l'ultimo progetto ha ripristino automatico; i recenti sono conservati per l'ultimo progetto.
+The session is saved every 15 seconds and during runtime-managed exits, including HOME. Recovery preserves unsaved buffers separately from their original files. The session includes a checksum and a backup. Only the most recent project supports automatic recovery; recent files are retained for that project.
 
-Il salvataggio usa temporaneo e backup. Un'interruzione dell'alimentazione può comunque interrompere una sequenza di operazioni FAT: se serve, controlla `.tmp` e `.bak`. Un'interruzione improvvisa può perdere le modifiche successive all'ultimo checkpoint riuscito.
+Saving uses a temporary file and a backup. A power interruption can still interrupt a sequence of FAT operations: check `.tmp` and `.bak` files if necessary. An unexpected interruption may result in the loss of changes made after the last successful checkpoint.
 
-| Risorsa | Limite |
+| Resource | Limit |
 |---|---|
-| Documenti aperti | 6 |
-| Documento / file trasferito | 512 KiB; al massimo 65.536 righe per documento |
-| Undo/redo | 64 modifiche raggruppate per documento, budget globale 2 MiB |
-| Progetto trasferito | 64 file, 4 MiB complessivi, profondità 8 |
-| Percorso relativo | 159 byte |
-| Percorso SD completo | Meno di 256 byte, secondo il SDK |
-| Output compilato | 15 MiB |
-| Log sul 3DS | 64 KiB; log completo sul computer |
-| Compilazioni contemporanee | 1; massimo 180 secondi per processo di build |
+| Open documents | 6 |
+| Document / transferred file | 512 KiB; maximum 65,536 lines per document |
+| Undo/redo | 64 grouped edits per document, 2 MiB global budget |
+| Transferred project | 64 files, 4 MiB total, depth 8 |
+| Relative path | 159 bytes |
+| Full SD path | Less than 256 bytes, according to the SDK |
+| Compiled output | 15 MiB |
+| Logs on the 3DS | 64 KiB; full logs on the computer |
+| Concurrent builds | 1; maximum 180 seconds per build process |
 
-Un file CRLF che supera 512 KiB dopo la conversione viene rifiutato al salvataggio: scegli LF o dividi il documento. UTF-8 viene conservato e navigato per codepoint, ma il font monospace mostra `?` per i glifi non supportati. Non c'è un IME Unicode.
+A CRLF file exceeding 512 KiB after conversion is rejected when saving: use LF or split the document. UTF-8 is preserved and navigated by code point, but the monospace font displays `?` for unsupported glyphs. There is no Unicode IME.
 
-La colorazione e i completamenti sono lessicali. Il compilatore sul computer fornisce gli errori semantici Auric/C. Non sono inclusi un language server completo, Git, espressioni regolari o un debugger interattivo. L'IDE non compila C o Auric autonomamente sulla console.
+Syntax highlighting and completions are lexical. The compiler running on the computer provides Auric/C semantic errors. A complete language server, Git integration, regular expressions, and an interactive debugger are not included. The IDE cannot compile C or Auric independently on the console.
 
-I log e le cartelle di lavoro restano in `AuroraOS/.vs3ds/<sessione>/` sul computer. Il servizio non elimina automaticamente quelle cartelle: puoi rimuovere quelle vecchie a servizio fermo. Riavviare il servizio azzera le sessioni in memoria.
+Logs and working directories remain in `AuroraOS/.vs3ds/<session>/` on the computer. The service does not automatically delete these directories: you can remove old ones while the service is stopped. Restarting the service clears in-memory sessions.
 
-## Verifiche eseguite
+## Tests Performed
 
-- Compilazione del servizio macOS con `-Wall -Wextra -Werror`.
-- Compilazione effettiva ARM del singolo sorgente tramite SDK 1.2 con `-Werror`.
-- Test del motore più 10.000 casi casuali di modifica, undo, redo e indice delle righe, con AddressSanitizer e UndefinedBehaviorSanitizer.
-- Test dei comandi con un SDK simulato: parentesi, indentazione, sostituzioni/ricerche adiacenti, spostamento e commento righe, salvataggio e recupero, rifiuto di sessioni corrotte e diagnostica Auric/C.
-- Protocollo TCP su localhost con compilatori reali Auric e C: autenticazione, upload frammentati e ripetuti, checksum, header multipli di progetto C, file vuoti, log e download a blocchi.
-- Rifiuto di percorsi fuori progetto, build incomplete, modifiche a una build già avviata e download dopo errori; annullamento del processo di compilazione.
-- Compilazione del template Auric generato dall'editor.
+- macOS host service compilation with `-Wall -Wextra -Werror`.
+- Actual ARM compilation of the single source file using SDK 1.2 with `-Werror`.
+- Editing engine tests plus 10,000 randomized cases covering editing, undo, redo, and line indexing, using AddressSanitizer and UndefinedBehaviorSanitizer.
+- Command tests with a simulated SDK: brackets, indentation, adjacent replacements/searches, line movement and commenting, saving and recovery, rejection of corrupted sessions, and Auric/C diagnostics.
+- TCP protocol testing on localhost with real Auric and C compilers: authentication, fragmented and repeated uploads, checksums, multiple C project headers, empty files, logs, and chunked downloads.
+- Rejection of paths outside the project, incomplete builds, modifications to an already-started build, and downloads after errors; cancellation of the compilation process.
+- Compilation of the Auric template generated by the editor.
 
-Il test integrato del motore si esegue dallo stesso file:
+The integrated editing engine test can be executed from the same file:
 
 ```sh
 cc -std=c11 -g -DVS3DS_TEST VSCode3DS.c -o vs3ds-test
 ./vs3ds-test
 ```
 
-Il collaudo finale su Old/New 3DS rimane necessario. Non sono stati misurati frame rate o prestazioni su hardware.
+Final testing on Old/New 3DS hardware is still required. Frame rates and performance have not been measured on actual hardware.
 
-## Provenienza
+## Provenance
 
-Il sorgente contiene il riferimento SDK/Auric del commit indicato e richiami alle licenze upstream. È marcato `GPL-3.0-or-later`; per distribuire l'app conserva anche gli avvisi e gli obblighi delle componenti AuroraOS collegate, descritti in [SDK — Licences](https://github.com/TeamAuroraOS/AuroraOS/blob/8123fd90b606e5a1c44d8a7e474edce83681dcab/sdk/README.md#licences) e nella repository originale.
+The source contains the SDK/Auric reference from the specified commit and references to upstream licenses. It is marked `GPL-3.0-or-later`. When distributing the application, also preserve the notices and obligations associated with the linked AuroraOS components, as described in [SDK — Licences](https://github.com/TeamAuroraOS/AuroraOS/blob/8123fd90b606e5a1c44d8a7e474edce83681dcab/sdk/README.md#licences) and the original repository.
